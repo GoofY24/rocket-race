@@ -1,1 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0e1a">
+<title>Rocket Race — Live Arcade</title>
 
+<!-- FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- STYLES -->
+<link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ANIMATED BACKGROUND                                     -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="bg-gradient"></div>
+<div class="bg-grid"></div>
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MAIN SHELL                                              -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="shell">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TOP BAR                                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <span class="brand-logo">🚀</span>
+        <span class="brand-pulse"></span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">ROCKET</span>
+        <span class="brand-suffix">RACE</span>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <div class="connection" id="connWrap">
+        <i id="connDot"></i>
+        <span id="connText">CONNECTING</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="balance-header">
+        <div class="balance-icon">💰</div>
+        <div class="balance-info">
+          <span class="balance-label">BALANCE</span>
+          <div class="balance-row">
+            <span class="balance-value" id="balanceDisplay">0.00</span>
+            <span class="balance-currency" id="currencyDisplay">GEL</span>
+          </div>
+        </div>
+      </div>
+      <button id="soundBtn" class="icon-btn" aria-label="Toggle sound">
+        <span class="icon-content">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- MAIN LAYOUT                                             -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <main class="layout">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LEFT SIDEBAR — LEADERBOARD + STATS                     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <aside class="sidebar-left">
+
+      <!-- LEADERBOARD -->
+      <div class="panel glass leaderboard-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">🏆</span>
+            <span class="panel-title">LEADERBOARD</span>
+          </div>
+          <span class="panel-badge live-badge-small">● LIVE</span>
+        </div>
+        <div id="leaderboard" class="leaderboard-list">
+          <div class="leaderboard-empty">
+            <span class="empty-icon">🏁</span>
+            <span>Waiting for players...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="panel glass stats-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">📊</span>
+            <span class="panel-title">YOUR STATS</span>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">SCORE</span>
+            <span class="stat-value" id="score">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">BEST</span>
+            <span class="stat-value highlight-green" id="best">1.00x</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">STREAK</span>
+            <span class="stat-value highlight-orange" id="streak">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">ROUNDS</span>
+            <span class="stat-value" id="rounds">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROVABLY FAIR -->
+      <div class="panel glass fair-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">🔐</span>
+            <span class="panel-title">PROVABLY FAIR</span>
+          </div>
+        </div>
+        <div class="hash-wrap">
+          <code id="hash" class="hash-display">—</code>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- CENTER — GAME                                           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="game glass">
+
+      <!-- GAME HEADER -->
+      <div class="game-top">
+        <div class="game-info">
+          <span class="round-badge">
+            <span class="round-label">ROUND</span>
+            <b id="roundId">—</b>
+          </span>
+          <span class="live-badge" id="liveBadge">● LIVE</span>
+        </div>
+
+        <div class="multiplier-wrap">
+          <div class="phase" id="phase">Connecting to the game…</div>
+        </div>
+
+        <div class="game-info-right">
+          <span class="players-badge">
+            <span class="players-dot"></span>
+            <span id="online">0</span>
+            <span class="players-label">PLAYERS</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- CANVAS -->
+      <div class="canvas-box">
+        <canvas id="canvas"></canvas>
+        <div id="countdown" class="countdown"></div>
+        <div id="result" class="result hidden">
+          <strong id="resultTitle"></strong>
+          <span id="resultValue"></span>
+        </div>
+      </div>
+
+      <!-- ⭐ LUCKY PLAYERS SECTION -->
+      <!-- <div class="lucky-players-section">
+        <div class="lucky-players-header">
+          <span class="lucky-players-icon">🎲</span>
+          <span class="lucky-players-title">LUCKY PLAYERS</span>
+          <span class="lucky-players-info">(5 random seeds used for crash)</span>
+        </div>
+        <div id="luckyPlayersList" class="lucky-players-list">
+          <div class="lucky-empty">
+            <span>🎲 5 Lucky Players will be selected...</span>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- BETTING UI -->
+      <div class="betting-area">
+
+        <!-- ROCKET SELECTION -->
+        <div class="rocket-select" id="rocketSelect">
+          <button class="rocket-btn red" data-r="red">
+            <div class="rocket-btn-bg"></div>
+            <div class="rocket-btn-content">
+              <div class="rocket-top">
+                <span class="rocket-icon">🚀</span>
+                <span class="rocket-name">RED</span>
+              </div>
+              <div class="rocket-mid">
+                <span class="rocket-mult" id="multRed">1.00x</span>
+              </div>
+              <div class="rocket-bot">
+                <span class="rocket-status" id="statusRed">SELECT</span>
+              </div>
+            </div>
+          </button>
+
+          <button class="rocket-btn green" data-r="green">
+            <div class="rocket-btn-bg"></div>
+            <div class="rocket-btn-content">
+              <div class="rocket-top">
+                <span class="rocket-icon">🚀</span>
+                <span class="rocket-name">GREEN</span>
+              </div>
+              <div class="rocket-mid">
+                <span class="rocket-mult" id="multGreen">1.00x</span>
+              </div>
+              <div class="rocket-bot">
+                <span class="rocket-status" id="statusGreen">SELECT</span>
+              </div>
+            </div>
+          </button>
+
+          <button class="rocket-btn blue" data-r="blue">
+            <div class="rocket-btn-bg"></div>
+            <div class="rocket-btn-content">
+              <div class="rocket-top">
+                <span class="rocket-icon">🚀</span>
+                <span class="rocket-name">BLUE</span>
+              </div>
+              <div class="rocket-mid">
+                <span class="rocket-mult" id="multBlue">1.00x</span>
+              </div>
+              <div class="rocket-bot">
+                <span class="rocket-status" id="statusBlue">SELECT</span>
+              </div>
+            </div>
+          </button>
+        </div>
+
+        <!-- BET CONTROLS -->
+        <div class="bet-controls">
+
+          <!-- AMOUNT -->
+          <div class="control-block">
+            <div class="control-label">BET AMOUNT</div>
+            <div class="bet-amounts" id="betAmounts">
+              <button class="bet-btn" data-amount="1">1</button>
+              <button class="bet-btn" data-amount="5">5</button>
+              <button class="bet-btn active" data-amount="10">10</button>
+              <button class="bet-btn" data-amount="50">50</button>
+            </div>
+          </div>
+
+          <!-- SUMMARY -->
+          <div class="control-block">
+            <div class="control-label">SUMMARY</div>
+            <div class="bet-summary">
+              <div class="summary-item">
+                <span class="summary-label">BET</span>
+                <span class="summary-value"><b id="betAmountDisplay">10</b> <small id="betCurrencyDisplay">GEL</small></span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">MULT</span>
+                <span class="summary-value highlight-green"><b id="currentMultiplierDisplay">1.00x</b></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="control-block control-block-actions">
+            <button class="btn-bet" id="betBtn">
+              <span class="btn-glow"></span>
+              <span class="btn-content">
+                <span class="btn-icon">🚀</span>
+                <span class="btn-text">PLACE BET</span>
+              </span>
+            </button>
+            <button class="btn-cashout" id="cashoutBtn">
+              <span class="btn-glow"></span>
+              <span class="btn-content">
+                <span class="btn-icon">💰</span>
+                <span class="btn-text">CASHOUT</span>
+              </span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- RIGHT SIDEBAR — HISTORY                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <aside class="sidebar-right">
+
+      <div class="panel glass history-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">📈</span>
+            <span class="panel-title">HISTORY</span>
+          </div>
+          <span class="panel-badge history-hint">Click to verify</span>
+        </div>
+        <div id="history" class="history-list">
+          <div class="history-empty">
+            <span class="empty-icon">⏳</span>
+            <span>No rounds yet</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel glass info-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">ℹ️</span>
+            <span class="panel-title">HOW TO PLAY</span>
+          </div>
+        </div>
+        <div class="info-content">
+          <div class="info-step">
+            <span class="info-num">1</span>
+            <span>აირჩიე რაკეტა (RED/GREEN/BLUE)</span>
+          </div>
+          <div class="info-step">
+            <span class="info-num">2</span>
+            <span>დადე ფსონი რაუნდის დაწყებამდე</span>
+          </div>
+          <div class="info-step">
+            <span class="info-num">3</span>
+            <span>Cashout გააკეთე აფეთქებამდე</span>
+          </div>
+          <div class="info-step">
+            <span class="info-num">4</span>
+            <span>მოიგე მულტიპლიკატორის მიხედვით</span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- HISTORY MODAL (Provably Fair Verification)             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="historyModal" class="modal hidden">
+  <div class="modal-content glass">
+
+    <!-- MODAL HEADER -->
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">🔐</span>
+        <h2 class="modal-title">
+          ROUND #<span id="modalRoundId">—</span>
+        </h2>
+        <span class="modal-subtitle">PROVABLY FAIR</span>
+      </div>
+      <button id="modalClose" class="modal-close-btn" aria-label="Close">
+        ✕
+      </button>
+    </div>
+
+    <!-- MODAL BODY -->
+    <div class="modal-body">
+
+      <!-- Timestamp -->
+      <div class="modal-section">
+        <div class="modal-section-title">
+          <span class="modal-section-icon">📅</span>
+          <span>TIMESTAMP</span>
+        </div>
+        <div id="modalTimestamp" class="modal-timestamp">—</div>
+      </div>
+
+      <!-- Results -->
+      <div class="modal-section">
+        <div class="modal-section-title">
+          <span class="modal-section-icon">🎯</span>
+          <span>RESULTS</span>
+        </div>
+        <div class="modal-results">
+          <div class="modal-result-item red">
+            <span class="modal-result-icon">🔴</span>
+            <span class="modal-result-label">RED</span>
+            <span class="modal-result-value" id="modalRed">—</span>
+          </div>
+          <div class="modal-result-item green">
+            <span class="modal-result-icon">🟢</span>
+            <span class="modal-result-label">GREEN</span>
+            <span class="modal-result-value" id="modalGreen">—</span>
+          </div>
+          <div class="modal-result-item blue">
+            <span class="modal-result-icon">🔵</span>
+            <span class="modal-result-label">BLUE</span>
+            <span class="modal-result-value" id="modalBlue">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lucky Players -->
+      <div class="modal-section">
+        <div class="modal-section-title">
+          <span class="modal-section-icon">🎲</span>
+          <span>LUCKY PLAYERS (5)</span>
+        </div>
+        <div id="modalLuckyPlayers" class="modal-lucky-list">
+          <div class="modal-empty">No data</div>
+        </div>
+      </div>
+
+      <!-- Provably Fair Data -->
+      <div class="modal-section">
+        <div class="modal-section-title">
+          <span class="modal-section-icon">🔐</span>
+          <span>PROVABLY FAIR DATA</span>
+        </div>
+
+        <div class="modal-field">
+          <label class="modal-field-label">Server Seed (revealed):</label>
+          <div class="modal-field-row">
+            <code id="modalServerSeed" class="modal-field-code">—</code>
+            <button class="copy-btn" data-copy-target="modalServerSeed" aria-label="Copy">📋</button>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <label class="modal-field-label">Server Seed Hash (commitment):</label>
+          <div class="modal-field-row">
+            <code id="modalServerSeedHash" class="modal-field-code">—</code>
+            <button class="copy-btn" data-copy-target="modalServerSeedHash" aria-label="Copy">📋</button>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <label class="modal-field-label">Nonce (Round ID):</label>
+          <div class="modal-field-row">
+            <code id="modalNonce" class="modal-field-code">—</code>
+          </div>
+        </div>
+
+        <div class="modal-field">
+          <label class="modal-field-label">All Client Seeds:</label>
+          <div id="modalAllSeeds" class="modal-all-seeds">
+            <div class="modal-empty">No data</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification -->
+      <div class="modal-section">
+        <div class="modal-section-title">
+          <span class="modal-section-icon">✅</span>
+          <span>VERIFICATION</span>
+        </div>
+        <button id="modalVerifyBtn" class="modal-verify-btn">
+          <span class="modal-verify-icon">🔄</span>
+          <span>VERIFY ROUND</span>
+        </button>
+        <div id="modalVerifyResult" class="modal-verify-result">
+          <div class="verify-pending">Click VERIFY to check round integrity</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="/assets/audio.js"></script>
+<script src="/assets/scene.js"></script>
+<script type="module" src="/assets/app.js"></script>
+
+</body>
+</html>
