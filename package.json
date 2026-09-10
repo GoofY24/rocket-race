@@ -1,0 +1,8 @@
+{
+  "name": "rocket-race-live-arcade",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node server/server.js" },
+  "dependencies": { "ws": "^8.18.3" }
+}
